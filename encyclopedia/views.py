@@ -14,7 +14,7 @@ def index(request):
         })
     elif request.method == "POST":
         entry = request.POST.get('q')
-    return viewentry(request,entry)
+    return HttpResponseRedirect(f"/wiki/{entry}")
 
 
 def viewentry(request,entry):
@@ -22,13 +22,24 @@ def viewentry(request,entry):
         title = entry
         entry = util.get_entry(entry)
         entry = md.markdown(entry)
+        return render(request, "encyclopedia/entryview.html", {
+            "entry": entry,
+            "title": title,
+        })
 
     else:
-        title = None
-        entry = None
+        possible_entries = []
+        for element in util.list_entries():
+            if entry.lower() in element.lower():
+                possible_entries.append(element)
+        if len(possible_entries) == 0:
+            return render(request, "encyclopedia/error.html")
+        return render (request, "encyclopedia/searchresults.html",{
+            "possible_entries": possible_entries
+        })
 
-    return render(request, "encyclopedia/entryview.html",{
-        "entry": entry,
-        "title": title,
-    })
+
+
+
+
 
