@@ -2,6 +2,16 @@ from django.shortcuts import render, redirect , reverse
 from django.http import HttpResponseRedirect
 import markdown2 as md
 from . import util
+from django import forms
+from random import choice
+
+class Newpageform(forms.Form):
+    title = forms.CharField(label= "title")
+
+    content = forms.CharField(label="add content")
+
+
+
 
 
 def gotowiki(request):
@@ -15,6 +25,7 @@ def index(request):
     elif request.method == "POST":
         entry = request.POST.get('q')
     return HttpResponseRedirect(f"/wiki/{entry}")
+
 
 
 def viewentry(request,entry):
@@ -37,9 +48,41 @@ def viewentry(request,entry):
         return render (request, "encyclopedia/searchresults.html",{
             "possible_entries": possible_entries
         })
+def newpage(request):
+    if request.method == "GET":
+        return render(request,"encyclopedia/newpage.html",{
+            "form": Newpageform()
+        })
+    elif request.method == "POST":
 
+        form = Newpageform(request.POST)
 
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            content = form.cleaned_data["content"]
 
+            if title not in util.list_entries():
+                util.save_entry(title,content)
+                return render(request,"encyclopedia/newpageadded.html")
+            else:
+                return render(request,"encyclopedia/pagecreateerror.html")
 
+def editpage(request,entry):
+    if request.method == "GET":
+        entry_content = util.get_entry(entry)
+        print(entry_content)
+        return render(request,"encyclopedia/editentry.html",{
+            "entry":entry,
+            "content":entry_content
+        })
+    else:
+        title = request.POST.get("entry")
+        content = request.POST.get("content").strip()
+        util.save_entry(title,content)
+        return HttpResponseRedirect(f"/wiki/{title}")
+def randompage(request):
+    entries = util.list_entries()
 
+    entry = choice(entries)
 
+    return HttpResponseRedirect(f"/wiki/{entry}")

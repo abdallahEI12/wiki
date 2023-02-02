@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>create new page</title>
+</head>
+<body>
+
+<h1> create new page</h1>
+<form action = "{% url 'encyclopedia:newpage' %}" method = "post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" placeholder="add new page">
+</form>
+
+</body>
+</html>

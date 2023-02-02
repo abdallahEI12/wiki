@@ -1,13 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>
-        {{ title }} - wiki
-    </title>
-</head>
-<body>
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    {{ title }} - wiki
+{% endblock %}
+
+{% block body %}
 
        {{ entry|safe }}
 
-</body>
-</html>
+<hr>
+    <div class="tools">
+        <div class="element">
+            <a href="{% url 'encyclopedia:editpage' title %}">edit page</a>
+        </div>
+    </div>
+
+{% endblock %}
